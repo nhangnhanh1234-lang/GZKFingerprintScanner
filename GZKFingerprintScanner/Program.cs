@@ -43,7 +43,11 @@ namespace GZKFingerprintScanner
             if (ex == null) return;
             try
             {
-                string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+                // Use LocalApplicationData to avoid requiring admin rights
+                string dir = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "GZKFingerprintScanner",
+                    "logs");
                 Directory.CreateDirectory(dir);
                 File.AppendAllText(
                     Path.Combine(dir, string.Format("crash-{0:yyyyMMdd}.log", DateTime.Now)),

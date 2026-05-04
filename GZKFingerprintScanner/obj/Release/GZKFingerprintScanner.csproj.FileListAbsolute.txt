@@ -28,3 +28,4 @@ E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintSc
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintScanner.pdb
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\Libs\libzkfp.dll
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\Libs\libzkfpcsharp.dll
+E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\libzkfp.dll

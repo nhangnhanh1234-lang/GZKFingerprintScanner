@@ -40,7 +40,11 @@ namespace GZKFingerprintScanner
 
         public TrayApplicationContext()
         {
-            _logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+            // Use LocalApplicationData to avoid requiring admin rights
+            _logDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "GZKFingerprintScanner",
+                "logs");
             Directory.CreateDirectory(_logDir);
 
             // Setup logging
