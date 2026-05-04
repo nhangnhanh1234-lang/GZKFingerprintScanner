@@ -1,0 +1,74 @@
+{
+  "format": 1,
+  "restore": {
+    "E:\\gtel\\GZKFingerprintScanner\\GZKFingerprintScanner\\GZKFingerprintScanner.csproj": {}
+  },
+  "projects": {
+    "E:\\gtel\\GZKFingerprintScanner\\GZKFingerprintScanner\\GZKFingerprintScanner.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "E:\\gtel\\GZKFingerprintScanner\\GZKFingerprintScanner\\GZKFingerprintScanner.csproj",
+        "projectName": "GZKFingerprintScanner",
+        "projectPath": "E:\\gtel\\GZKFingerprintScanner\\GZKFingerprintScanner\\GZKFingerprintScanner.csproj",
+        "packagesPath": "C:\\Users\\NHANGNOOB\\.nuget\\packages\\",
+        "outputPath": "E:\\gtel\\GZKFingerprintScanner\\GZKFingerprintScanner\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "UsingMicrosoftNETSdk": false,
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\NHANGNOOB\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://www.nuget.org/api/v2": {}
+        },
+        "frameworks": {
+          "net472": {
+            "projectReferences": {}
+          }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net472": {
+          "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
+            "SocketIOClient": {
+              "target": "Package",
+              "version": "[3.1.1, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-arm64": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}
