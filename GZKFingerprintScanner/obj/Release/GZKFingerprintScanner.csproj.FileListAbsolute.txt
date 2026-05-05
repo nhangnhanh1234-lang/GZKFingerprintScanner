@@ -1,5 +1,9 @@
-E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\libzkfpcsharp.dll
+E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\App.config
+E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\Libs\libzkfp.dll
+E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\Libs\libzkfpcsharp.dll
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\GZKFingerprintScanner.exe.config
+E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\GZKFingerprintScanner.exe.manifest
+E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\GZKFingerprintScanner.application
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\GZKFingerprintScanner.exe
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\GZKFingerprintScanner.pdb
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll
@@ -16,6 +20,7 @@ E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\System.Text.Enco
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\System.Text.Json.dll
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\System.Threading.Tasks.Extensions.dll
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\System.ValueTuple.dll
+E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\libzkfpcsharp.dll
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\Microsoft.Win32.Registry.dll
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintScanner.csproj.AssemblyReference.cache
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintScanner.csproj.SuggestedBindingRedirects.cache
@@ -23,9 +28,8 @@ E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintSc
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintScanner.Properties.Resources.resources
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintScanner.csproj.GenerateResource.cache
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintScanner.csproj.CoreCompileInputs.cache
+E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintScanner.exe.manifest
+E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintScanner.application
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFinge.87B77DCB.Up2Date
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintScanner.exe
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintScanner.pdb
-E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\Libs\libzkfp.dll
-E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\Libs\libzkfpcsharp.dll
-E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\libzkfp.dll

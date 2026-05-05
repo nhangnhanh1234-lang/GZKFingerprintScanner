@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -22,6 +23,21 @@ namespace GZKFingerprintScanner
                         "GZKFingerprintScanner đang chạy ở system tray.",
                         "GZKFingerprintScanner", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
+                }
+
+                // Bật TLS 1.2/1.3 cho .NET 4.7.2 (mặc định chỉ TLS 1.0/1.1).
+                // Cần thiết cho HTTPS/WSS server hiện đại (vd: gemr-socket.emed.vn).
+                try
+                {
+                    ServicePointManager.SecurityProtocol =
+                        SecurityProtocolType.Tls12 |
+                        (SecurityProtocolType)3072 | // Tls12 (compatibility)
+                        (SecurityProtocolType)12288; // Tls13 (nếu OS hỗ trợ)
+                }
+                catch
+                {
+                    // Fallback nếu OS cũ không hỗ trợ Tls13
+                    try { ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12; } catch { }
                 }
 
                 // Global exception handlers - đừng để app chết ngầm

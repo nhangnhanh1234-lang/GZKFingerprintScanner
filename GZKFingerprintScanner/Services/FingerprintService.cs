@@ -21,6 +21,9 @@ namespace GZKFingerprintScanner.Services
         private volatile bool _isRunning;
 
         public bool IsRunning { get { return _isRunning; } }
+        public bool IsSocketConnected { get { return _socket != null && _socket.IsConnected; } }
+        public bool IsDeviceOpen { get { return _zk != null && _zk.IsDeviceOpen; } }
+        public string DeviceSerial { get { return _zk != null ? _zk.DeviceSerial : null; } }
 
         public FingerprintService(ILogger logger, SocketClientService socket, ZkTecoService zk, DeviceOptions deviceOpts)
         {

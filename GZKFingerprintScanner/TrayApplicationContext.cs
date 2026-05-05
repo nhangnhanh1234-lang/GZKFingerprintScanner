@@ -116,7 +116,7 @@ namespace GZKFingerprintScanner
                 {
                     _socketOpts = new SocketOptions
                     {
-                        Url = remoteConfig.ContainsKey("Socket:Url") ? remoteConfig["Socket:Url"] : "http://203.171.28.178:8023",
+                        Url = remoteConfig.ContainsKey("Socket:Url") ? remoteConfig["Socket:Url"] : "https://gemr-socket.emed.vn",
                         ClientName = remoteConfig.ContainsKey("Socket:ClientName") ? remoteConfig["Socket:ClientName"] : "GZKFingerprintScanner",
                         Group = remoteConfig.ContainsKey("Socket:Group") ? remoteConfig["Socket:Group"] : "kyvantay",
                         ReconnectionDelayMs = remoteConfig.ContainsKey("Socket:ReconnectionDelayMs") ? int.Parse(remoteConfig["Socket:ReconnectionDelayMs"]) : 2000,
@@ -173,10 +173,51 @@ namespace GZKFingerprintScanner
             catch { return null; }
         }
 
+        private void LogStartupDiagnostics()
+        {
+            try
+            {
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                _logger.LogInformation("===== STARTUP DIAGNOSTICS =====");
+                _logger.LogInformation(string.Format("  Install dir : {0}", baseDir));
+                _logger.LogInformation(string.Format("  Process bits: {0}-bit", IntPtr.Size * 8));
+                _logger.LogInformation(string.Format("  OS         : {0}", Environment.OSVersion));
+                _logger.LogInformation(string.Format("  CLR        : {0}", Environment.Version));
+
+                string[] requiredDlls = {
+                    "libzkfp.dll", "libzkfpcsharp.dll",
+                    "Newtonsoft.Json.dll", "SocketIOClient.dll",
+                    "Microsoft.Bcl.AsyncInterfaces.dll",
+                    "System.Buffers.dll", "System.Memory.dll",
+                    "System.Numerics.Vectors.dll",
+                    "System.Runtime.CompilerServices.Unsafe.dll",
+                    "System.Threading.Channels.dll",
+                    "System.Threading.Tasks.Extensions.dll",
+                    "System.ValueTuple.dll",
+                    "System.Text.Encodings.Web.dll",
+                    "System.Text.Json.dll"
+                };
+                foreach (string dll in requiredDlls)
+                {
+                    string path = Path.Combine(baseDir, dll);
+                    if (File.Exists(path))
+                        _logger.LogInformation(string.Format("  [OK] {0} ({1:N0} bytes)", dll, new FileInfo(path).Length));
+                    else
+                        _logger.LogError(string.Format("  [MISSING] {0} - installer did not deploy this file!", dll));
+                }
+                _logger.LogInformation("===============================");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Diagnostics failed: " + ex.Message);
+            }
+        }
+
         private void StartService()
         {
             try
             {
+                LogStartupDiagnostics();
                 var zk = new ZkTecoService(_zkLogger, _deviceOpts);
                 var socket = new SocketClientService(_socketLogger, _socketOpts, zk);
                 _service = new FingerprintService(_logger, socket, zk, _deviceOpts);
@@ -247,27 +288,35 @@ namespace GZKFingerprintScanner
                     return;
                 }
 
-                bool sockOk = false;
-                bool devOk = false;
+                bool sockOk = _service.IsSocketConnected;
+                bool devOk = _service.IsDeviceOpen;
 
-                if (_service != null)
+                if (sockOk && devOk)
                 {
-                    // We need to access internal state - this is a simplified approach
-                    // In real implementation, expose these through FingerprintService
-                    sockOk = true; // Placeholder
-                    devOk = true;  // Placeholder
+                    _miStatus.Text = "Status: ● Running";
+                    _miStatus.ForeColor = Color.Green;
+                }
+                else if (sockOk && !devOk)
+                {
+                    _miStatus.Text = "Status: ◐ Socket only (no device)";
+                    _miStatus.ForeColor = Color.DarkOrange;
+                }
+                else if (!sockOk && devOk)
+                {
+                    _miStatus.Text = "Status: ◐ Device only (no socket)";
+                    _miStatus.ForeColor = Color.DarkOrange;
+                }
+                else
+                {
+                    _miStatus.Text = "Status: ● Offline";
+                    _miStatus.ForeColor = Color.Red;
                 }
 
-                _miStatus.Text = (sockOk && devOk)
-                    ? "Status: ● Running"
-                    : sockOk ? "Status: ◐ Socket only"
-                    : "Status: ● Offline";
-                _miStatus.ForeColor = (sockOk && devOk) ? Color.Green
-                                    : sockOk ? Color.DarkOrange
-                                    : Color.Red;
-
-                _miConn.Text = string.Format("Socket: {0}{1}", sockOk ? "✓ " : "✗ ", _socketOpts.Url);
-                _miDevice.Text = string.Format("Device: {0}", devOk ? "✓ connected" : "✗ offline");
+                _miConn.Text = string.Format("Socket: {0} {1}", sockOk ? "✓" : "✗", _socketOpts.Url);
+                string sn = _service.DeviceSerial;
+                _miDevice.Text = devOk
+                    ? string.Format("Device: ✓ {0}", string.IsNullOrEmpty(sn) ? "connected" : sn)
+                    : "Device: ✗ offline";
                 _miUptime.Text = string.Format("Uptime: {0:hh\\:mm\\:ss}", DateTime.Now - _startedAt);
 
                 string trayText = _miStatus.Text;

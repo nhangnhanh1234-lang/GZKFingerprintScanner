@@ -35,6 +35,7 @@ namespace GZKFingerprintScanner.Services
         public event Func<DeviceStatus, bool> OnDeviceStatusChanged;
 
         public bool IsDeviceOpen { get { return _deviceOpen; } }
+        public string DeviceSerial { get { return _deviceSn; } }
 
         public ZkTecoService(ILogger logger, DeviceOptions options)
         {
@@ -46,7 +47,36 @@ namespace GZKFingerprintScanner.Services
         {
             if (_deviceOpen) return true;
 
-            int ret = _fp.Initialize();
+            int ret;
+            try
+            {
+                ret = _fp.Initialize();
+            }
+            catch (DllNotFoundException ex)
+            {
+                _logger.LogError(ex, "Native DLL 'libzkfp.dll' not found. Make sure libzkfp.dll and libzkfpcsharp.dll are deployed alongside the EXE, and Visual C++ Redistributable (x86) is installed on this machine.");
+                RaiseStatus("error", "Missing libzkfp.dll - check installer & VC++ Redistributable x86");
+                return false;
+            }
+            catch (BadImageFormatException ex)
+            {
+                _logger.LogError(ex, "libzkfp.dll architecture mismatch. The DLL is 32-bit; the app must be built as x86.");
+                RaiseStatus("error", "DLL architecture mismatch (build as x86)");
+                return false;
+            }
+            catch (System.IO.FileNotFoundException ex)
+            {
+                _logger.LogError(ex, "Required dependency not found near libzkfp.dll. Likely missing Visual C++ Redistributable (x86).");
+                RaiseStatus("error", "Missing dependency - install VC++ Redistributable x86");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error initializing ZK SDK");
+                RaiseStatus("error", "ZK init exception: " + ex.Message);
+                return false;
+            }
+
             if (ret != zkfp.ZKFP_ERR_OK)
             {
                 _logger.LogError(string.Format("ZK Initialize failed: {0} - {1}", ret, ZkErrorCodes.GetMessage(ret)));

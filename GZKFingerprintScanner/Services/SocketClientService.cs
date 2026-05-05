@@ -39,15 +39,35 @@ namespace GZKFingerprintScanner.Services
 
         public void Start(CancellationToken ct)
         {
-            var uri = new Uri(_opts.Url);
-            _client = new SocketIOClient.SocketIO(uri, new SocketIOOptions
+            _logger.LogInformation(string.Format("[SOCKET] Start() called. URL={0}", _opts.Url));
+            Uri uri;
+            try
             {
-                Reconnection = true,
-                ReconnectionDelay = _opts.ReconnectionDelayMs,
-                ReconnectionAttempts = 10,
-                ConnectionTimeout = TimeSpan.FromSeconds(_opts.ConnectionTimeoutSeconds),
-                Transport = SocketIOClient.Transport.TransportProtocol.WebSocket
-            });
+                uri = new Uri(_opts.Url);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, string.Format("[SOCKET] Invalid URL: {0}", _opts.Url));
+                return;
+            }
+
+            try
+            {
+                _client = new SocketIOClient.SocketIO(uri, new SocketIOOptions
+                {
+                    Reconnection = true,
+                    ReconnectionDelay = _opts.ReconnectionDelayMs,
+                    ReconnectionAttempts = 10,
+                    ConnectionTimeout = TimeSpan.FromSeconds(_opts.ConnectionTimeoutSeconds),
+                    Transport = SocketIOClient.Transport.TransportProtocol.Polling
+                });
+                _logger.LogInformation("[SOCKET] Client instance created. Wiring events...");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[SOCKET] Failed to create SocketIO client. Likely missing dependency DLL (Newtonsoft.Json/SocketIOClient/System.Buffers/System.Memory).");
+                return;
+            }
 
             _client.OnConnected += async (sender, e) =>
             {
@@ -99,15 +119,27 @@ namespace GZKFingerprintScanner.Services
                 catch { }
             });
 
+            _logger.LogInformation("[SOCKET] Calling ConnectAsync()...");
             Task.Run(async () =>
             {
                 try
                 {
-                    await _client.ConnectAsync();
+                    // Watchdog: nếu ConnectAsync hang quá ConnectionTimeout+10s, log cảnh báo
+                    var connectTask = _client.ConnectAsync();
+                    var watchdog = Task.Delay(TimeSpan.FromSeconds(_opts.ConnectionTimeoutSeconds + 10), ct);
+                    var first = await Task.WhenAny(connectTask, watchdog);
+                    if (first == watchdog && !connectTask.IsCompleted)
+                    {
+                        _logger.LogError(string.Format(
+                            "[SOCKET] ConnectAsync() HANG >{0}s without throwing. Likely missing dependency DLL (System.Buffers/System.Memory/System.Text.Json/etc). Check STARTUP DIAGNOSTICS above for [MISSING] entries.",
+                            _opts.ConnectionTimeoutSeconds + 10));
+                    }
+                    await connectTask;
+                    _logger.LogInformation("[SOCKET] ConnectAsync() returned");
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(string.Format("Initial Socket.IO connect failed (will retry in background): {0}", ex.Message));
+                    _logger.LogError(ex, "[SOCKET] Initial Socket.IO connect failed (will retry in background)");
                 }
             }, ct);
         }

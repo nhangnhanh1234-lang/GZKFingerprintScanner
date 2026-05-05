@@ -80,7 +80,7 @@ namespace GZKFingerprintScanner.Models
 
     public class SocketOptions
     {
-        public string Url { get; set; } = "http://203.171.28.178:8023";
+        public string Url { get; set; } = "https://gemr-socket.emed.vn";
         public string ClientName { get; set; } = "GZKFingerprintScanner";
         public string Group { get; set; } = "kyvantay";
         public int ReconnectionDelayMs { get; set; } = 2000;
