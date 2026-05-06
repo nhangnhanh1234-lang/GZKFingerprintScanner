@@ -32,14 +32,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GZKFingerprintScanner.exe" size="77280">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GZKFingerprintScanner.exe" size="81888">
       <assemblyIdentity name="GZKFingerprintScanner" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>yr+vWdGntfwqcK9aTuiADIf6yJJ7JdWB8CVEWGAC6xo=</dsig:DigestValue>
+        <dsig:DigestValue>CoNN4ujNzRd/+f+JVbjBrvqInY+1KXOtAoG8DsLHaNk=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

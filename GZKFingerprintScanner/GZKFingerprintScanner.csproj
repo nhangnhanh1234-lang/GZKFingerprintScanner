@@ -102,6 +102,7 @@
     <Compile Include="Services\FingerprintService.cs" />
     <Compile Include="Services\ZkTecoService.cs" />
     <Compile Include="Services\SocketClientService.cs" />
+    <Compile Include="UI\ModernMenuRenderer.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

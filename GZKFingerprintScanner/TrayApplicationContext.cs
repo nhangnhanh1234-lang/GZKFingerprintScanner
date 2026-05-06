@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using GZKFingerprintScanner.Logging;
 using GZKFingerprintScanner.Models;
 using GZKFingerprintScanner.Services;
+using GZKFingerprintScanner.UI;
 
 namespace GZKFingerprintScanner
 {
@@ -53,27 +54,50 @@ namespace GZKFingerprintScanner
             _socketLogger = _loggerProvider.CreateLogger("Socket");
             _zkLogger = _loggerProvider.CreateLogger("ZkTeco");
 
-            // Context menu
-            _menu = new ContextMenuStrip();
-            _menu.ShowImageMargin = false;
+            // Context menu - hiện đại, dark theme
+            _menu = new ContextMenuStrip
+            {
+                Renderer = new ModernMenuRenderer(),
+                BackColor = ModernColorTable.Background,
+                ForeColor = ModernColorTable.Text,
+                Font = new Font("Segoe UI", 9.25f, FontStyle.Regular),
+                ShowImageMargin = false,
+                ShowCheckMargin = false,
+                Padding = new Padding(4, 6, 4, 6),
+                DropShadowEnabled = true
+            };
 
-            _miStatus = AddInfoItem("Status: ● khởi động…");
+            // Header app title
+            _menu.Items.Add(BuildTitleItem());
+            _menu.Items.Add(BuildSeparator());
+
+            // Status section
+            _menu.Items.Add(BuildSectionHeader("STATUS"));
+            _miStatus = AddInfoItem("●  Đang khởi động…");
             _miConn = AddInfoItem("Socket: —");
             _miDevice = AddInfoItem("Device: —");
             _miUptime = AddInfoItem("Uptime: 00:00:00");
-            _menu.Items.Add(new ToolStripSeparator());
+            _menu.Items.Add(BuildSeparator());
 
-            _menu.Items.Add("Mở Web Console", null, (s, e) => OpenWebConsole());
-            _menu.Items.Add("Restart service", null, (s, e) => Task.Run(RestartService));
-            _menu.Items.Add(new ToolStripSeparator());
-            _menu.Items.Add("Open Install Folder", null, (s, e) => SafeOpen(AppDomain.CurrentDomain.BaseDirectory));
-            _menu.Items.Add("Open Logs Folder", null, (s, e) => SafeOpen(_logDir));
-            _menu.Items.Add(new ToolStripSeparator());
+            // Actions section
+            _menu.Items.Add(BuildSectionHeader("ACTIONS"));
+            _menu.Items.Add(BuildActionItem("\uD83C\uDF10  Mở Web Console", (s, e) => OpenWebConsole()));
+            _menu.Items.Add(BuildActionItem("\u21BB  Khởi động lại dịch vụ", (s, e) => Task.Run(RestartService)));
+            _menu.Items.Add(BuildSeparator());
 
-            _miAutostart = new ToolStripMenuItem("Khởi động cùng Windows")
+            // Folders section
+            _menu.Items.Add(BuildSectionHeader("FOLDERS"));
+            _menu.Items.Add(BuildActionItem("\uD83D\uDCC1  Mở thư mục cài đặt", (s, e) => SafeOpen(AppDomain.CurrentDomain.BaseDirectory)));
+            _menu.Items.Add(BuildActionItem("\uD83D\uDCDC  Mở thư mục logs", (s, e) => SafeOpen(_logDir)));
+            _menu.Items.Add(BuildSeparator());
+
+            // Settings
+            _miAutostart = new ToolStripMenuItem("\u2699  Khởi động cùng Windows")
             {
                 CheckOnClick = true,
-                Checked = StartupRegistry.IsEnabled()
+                Checked = StartupRegistry.IsEnabled(),
+                Padding = new Padding(8, 6, 8, 6),
+                Font = _menu.Font
             };
             _miAutostart.Click += (s, e) =>
             {
@@ -81,9 +105,12 @@ namespace GZKFingerprintScanner
                 catch (Exception ex) { ShowError("Không thể cập nhật autostart: " + ex.Message); _miAutostart.Checked = !_miAutostart.Checked; }
             };
             _menu.Items.Add(_miAutostart);
-            _menu.Items.Add(new ToolStripSeparator());
+            _menu.Items.Add(BuildSeparator());
 
-            _menu.Items.Add("Quit", null, (s, e) => Task.Run(QuitAsync));
+            // Quit - màu đỏ nhạt để nổi bật
+            var quit = BuildActionItem("\u2715  Thoát", (s, e) => Task.Run(QuitAsync));
+            quit.ForeColor = Color.FromArgb(239, 100, 100);
+            _menu.Items.Add(quit);
 
             // Tray icon
             _tray = new NotifyIcon
@@ -283,40 +310,50 @@ namespace GZKFingerprintScanner
             {
                 if (_service == null)
                 {
-                    _miStatus.Text = "Status: ● Not started";
-                    _miStatus.ForeColor = Color.Gray;
+                    _miStatus.Text = "○  Chưa khởi động";
+                    _miStatus.ForeColor = Color.FromArgb(160, 160, 160);
                     return;
                 }
 
                 bool sockOk = _service.IsSocketConnected;
                 bool devOk = _service.IsDeviceOpen;
 
+                Color colorOk = Color.FromArgb(34, 197, 94);     // green-500
+                Color colorWarn = Color.FromArgb(245, 158, 11);  // amber-500
+                Color colorErr = Color.FromArgb(239, 68, 68);    // red-500
+                Color colorMuted = Color.FromArgb(180, 180, 180);
+
                 if (sockOk && devOk)
                 {
-                    _miStatus.Text = "Status: ● Running";
-                    _miStatus.ForeColor = Color.Green;
+                    _miStatus.Text = "●  Đang hoạt động";
+                    _miStatus.ForeColor = colorOk;
                 }
                 else if (sockOk && !devOk)
                 {
-                    _miStatus.Text = "Status: ◐ Socket only (no device)";
-                    _miStatus.ForeColor = Color.DarkOrange;
+                    _miStatus.Text = "◐  Chỉ có Socket (thiếu device)";
+                    _miStatus.ForeColor = colorWarn;
                 }
                 else if (!sockOk && devOk)
                 {
-                    _miStatus.Text = "Status: ◐ Device only (no socket)";
-                    _miStatus.ForeColor = Color.DarkOrange;
+                    _miStatus.Text = "◐  Chỉ có Device (thiếu socket)";
+                    _miStatus.ForeColor = colorWarn;
                 }
                 else
                 {
-                    _miStatus.Text = "Status: ● Offline";
-                    _miStatus.ForeColor = Color.Red;
+                    _miStatus.Text = "●  Offline";
+                    _miStatus.ForeColor = colorErr;
                 }
 
-                _miConn.Text = string.Format("Socket: {0} {1}", sockOk ? "✓" : "✗", _socketOpts.Url);
+                _miConn.Text = string.Format("{0}  Socket  ·  {1}", sockOk ? "✓" : "✗", _socketOpts.Url);
+                _miConn.ForeColor = sockOk ? colorMuted : colorErr;
+
                 string sn = _service.DeviceSerial;
                 _miDevice.Text = devOk
-                    ? string.Format("Device: ✓ {0}", string.IsNullOrEmpty(sn) ? "connected" : sn)
-                    : "Device: ✗ offline";
+                    ? string.Format("✓  Device  ·  {0}", string.IsNullOrEmpty(sn) ? "đã kết nối" : sn)
+                    : "✗  Device  ·  chưa kết nối";
+                _miDevice.ForeColor = devOk ? colorMuted : colorErr;
+
+                _miUptime.ForeColor = colorMuted;
                 _miUptime.Text = string.Format("Uptime: {0:hh\\:mm\\:ss}", DateTime.Now - _startedAt);
 
                 string trayText = _miStatus.Text;
@@ -329,10 +366,52 @@ namespace GZKFingerprintScanner
 
         private ToolStripMenuItem AddInfoItem(string text)
         {
-            var it = new ToolStripMenuItem(text);
-            it.Enabled = false;
+            var it = new ToolStripMenuItem(text)
+            {
+                Enabled = false,
+                Padding = new Padding(8, 4, 8, 4),
+                Font = new Font("Segoe UI", 9f, FontStyle.Regular)
+            };
             _menu.Items.Add(it);
             return it;
+        }
+
+        private ToolStripLabel BuildTitleItem()
+        {
+            return new ToolStripLabel("ZK Fingerprint Service")
+            {
+                Enabled = false,
+                Padding = new Padding(10, 8, 10, 4),
+                Font = new Font("Segoe UI Semibold", 10.5f, FontStyle.Bold),
+                ForeColor = Color.White
+            };
+        }
+
+        private ToolStripLabel BuildSectionHeader(string text)
+        {
+            return new ToolStripLabel(text)
+            {
+                Enabled = false,
+                Padding = new Padding(10, 4, 10, 2),
+                Font = new Font("Segoe UI", 7.5f, FontStyle.Bold),
+                ForeColor = Color.FromArgb(140, 140, 140)
+            };
+        }
+
+        private ToolStripMenuItem BuildActionItem(string text, EventHandler onClick)
+        {
+            var it = new ToolStripMenuItem(text)
+            {
+                Padding = new Padding(8, 6, 8, 6),
+                Font = new Font("Segoe UI", 9.25f, FontStyle.Regular)
+            };
+            it.Click += onClick;
+            return it;
+        }
+
+        private ToolStripSeparator BuildSeparator()
+        {
+            return new ToolStripSeparator { Margin = new Padding(0, 4, 0, 4) };
         }
 
         private void OpenWebConsole()
