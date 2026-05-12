@@ -1,0 +1,18 @@
+Windows Registry Editor Version 5.00
+
+; Đăng ký Deep Link protocol gemr://
+; Chạy file này với quyền Administrator trước khi sử dụng Deep Link
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\gemr]
+@="URL:gemr Protocol"
+"URL Protocol"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\gemr\DefaultIcon]
+@="\"C:\\Program Files (x86)\\Gtel\\GZKFingerprintScannerApp\\GZKFingerprintScanner.exe\",0"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\gemr\shell]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\gemr\shell\open]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\gemr\shell\open\command]
+@="\"C:\\Program Files (x86)\\Gtel\\GZKFingerprintScannerApp\\GZKFingerprintScanner.exe\" \"%1\""

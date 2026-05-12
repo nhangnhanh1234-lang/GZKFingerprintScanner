@@ -4,7 +4,8 @@
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
-        <!-- UAC Manifest Options - Running as standard user (asInvoker) for auto-start compatibility -->
+        <!-- UAC Manifest Options - ClickOnce không hỗ trợ requireAdministrator -->
+        <!-- Đăng ký Deep Link cần chạy 1 lần với quyền Admin (xem RegisterDeepLink.reg) -->
         <requestedExecutionLevel level="asInvoker" uiAccess="false" />
       </requestedPrivileges>
     </security>

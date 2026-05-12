@@ -23,7 +23,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -88,14 +88,20 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
     </PackageReference>
+    <PackageReference Include="System.Text.Json">
+      <Version>8.0.5</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TrayApplicationContext.cs" />
     <Compile Include="StartupRegistry.cs" />
+    <Compile Include="DeepLinkRegistry.cs" />
+    <Compile Include="SingleInstanceManager.cs" />
     <Compile Include="Models\ZkMessages.cs" />
     <Compile Include="Helpers\BitmapFormat.cs" />
     <Compile Include="Helpers\ZkErrorCodes.cs" />
     <Compile Include="Helpers\ZkMsg.cs" />
+    <Compile Include="Helpers\MacAddressHelper.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\FileLogger.cs" />
     <Compile Include="Logging\FileLoggerProvider.cs" />
@@ -146,6 +152,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Visible>true</Visible>
     </Content>
+    <!-- Web Console -->
+    <Content Include="Resources\WebClient\index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <!-- Phải để là None và đảm bảo file này có nội dung BindingRedirect như tôi đã đưa -->
@@ -171,4 +181,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- Force copy tất cả NuGet runtime DLLs vào output để ClickOnce tìm thấy -->
+  <Target Name="CopyNuGetDepsToOutput" AfterTargets="ResolveAssemblyReferences">
+    <Copy SourceFiles="@(ReferenceCopyLocalPaths)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" Condition="'%(ReferenceCopyLocalPaths.Extension)' == '.dll'" />
+  </Target>
 </Project>

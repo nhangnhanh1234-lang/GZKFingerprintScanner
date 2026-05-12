@@ -21,9 +21,16 @@ namespace GZKFingerprintScanner.Services
             DateFormatString = "yyyy-MM-ddTHH:mm:ss.fffZ"
         };
 
+        private string _currentRoom;
+
         public bool IsConnected
         {
             get { return _client != null && _client.Connected; }
+        }
+
+        public string CurrentRoom
+        {
+            get { return _currentRoom; }
         }
 
         public SocketClientService(ILogger logger, SocketOptions opts, ZkTecoService zk)
@@ -73,14 +80,14 @@ namespace GZKFingerprintScanner.Services
             {
                 _logger.LogInformation(string.Format("[SOCKET] ====== CONNECTED ====== url={0} id={1}", _opts.Url, _client.Id));
 
-                await _client.EmitAsync("join", _opts.Group);
-                _logger.LogInformation(string.Format("[SOCKET] Joined room '{0}'", _opts.Group));
+                // KHÔNG auto-join room ở đây - để TrayApplicationContext quyết định room (mặc định là deviceId)
+                // Room sẽ được join sau khi có deviceId từ MAC Address
 
                 await EmitMessageAsync(new
                 {
                     type = "serviceReady",
                     service = _opts.ClientName,
-                    group = _opts.Group,
+                    group = _currentRoom ?? "pending",
                     status = "online",
                     deviceOpen = _zk.IsDeviceOpen,
                     timestamp = DateTime.UtcNow
@@ -152,6 +159,73 @@ namespace GZKFingerprintScanner.Services
                 _client.DisconnectAsync().Wait(TimeSpan.FromSeconds(2));
             }
             catch { }
+        }
+
+        /// <summary>
+        /// Rời room hiện tại (nếu có) và join room mới.
+        /// </summary>
+        public async Task<bool> JoinRoomAsync(string roomName)
+        {
+            if (_client == null || !_client.Connected)
+            {
+                _logger.LogWarning("[SOCKET] Cannot join room - not connected");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(roomName))
+            {
+                _logger.LogWarning("[SOCKET] Cannot join room - room name is empty");
+                return false;
+            }
+
+            // Rời room cũ trước
+            if (!string.IsNullOrEmpty(_currentRoom) && _currentRoom != roomName)
+            {
+                await LeaveRoomAsync();
+            }
+
+            try
+            {
+                await _client.EmitAsync("join", roomName);
+                _currentRoom = roomName;
+                _logger.LogInformation(string.Format("[SOCKET] Joined room '{0}'", roomName));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, string.Format("[SOCKET] Failed to join room '{0}'", roomName));
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Rời room hiện tại.
+        /// </summary>
+        public async Task<bool> LeaveRoomAsync()
+        {
+            if (_client == null || !_client.Connected)
+            {
+                _logger.LogWarning("[SOCKET] Cannot leave room - not connected");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(_currentRoom))
+            {
+                return true; // Không trong room nào
+            }
+
+            try
+            {
+                await _client.EmitAsync("leave", _currentRoom);
+                _logger.LogInformation(string.Format("[SOCKET] Left room '{0}'", _currentRoom));
+                _currentRoom = null;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, string.Format("[SOCKET] Failed to leave room '{0}'", _currentRoom));
+                return false;
+            }
         }
 
         private void OnMessageReceived(string raw)

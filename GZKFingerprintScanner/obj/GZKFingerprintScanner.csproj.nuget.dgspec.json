@@ -51,6 +51,10 @@
             "SocketIOClient": {
               "target": "Package",
               "version": "[3.1.1, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[8.0.5, )"
             }
           }
         }

@@ -52,13 +52,13 @@
         "Entry"
         {
         "MsmKey" = "8:_1B05A34E4C204582DFFCA82A07DBC120"
-        "OwnerKey" = "8:_BEF1041A41D24FF591F281F3D90D09C9"
+        "OwnerKey" = "8:_CF812D926732E98F85DED0A9B5FF1214"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_1B05A34E4C204582DFFCA82A07DBC120"
-        "OwnerKey" = "8:_CF812D926732E98F85DED0A9B5FF1214"
+        "OwnerKey" = "8:_BEF1041A41D24FF591F281F3D90D09C9"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -71,6 +71,12 @@
         {
         "MsmKey" = "8:_1B05A34E4C204582DFFCA82A07DBC120"
         "OwnerKey" = "8:_369A22F67633EAF2A7FC46E4D6814E9F"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_1E277756E6F7CD623B971F39D65AF823"
+        "OwnerKey" = "8:_1B05A34E4C204582DFFCA82A07DBC120"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -100,6 +106,12 @@
         "Entry"
         {
         "MsmKey" = "8:_2D9E437764D3BD6552C64B7789A0C1F3"
+        "OwnerKey" = "8:_D5A63D4B34321F7743C7191644DB7546"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2D9E437764D3BD6552C64B7789A0C1F3"
         "OwnerKey" = "8:_369A22F67633EAF2A7FC46E4D6814E9F"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -107,12 +119,6 @@
         {
         "MsmKey" = "8:_2D9E437764D3BD6552C64B7789A0C1F3"
         "OwnerKey" = "8:_2EB769AF10A2C93EFABA2E285974240C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_2D9E437764D3BD6552C64B7789A0C1F3"
-        "OwnerKey" = "8:_D5A63D4B34321F7743C7191644DB7546"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -136,13 +142,13 @@
         "Entry"
         {
         "MsmKey" = "8:_2EB769AF10A2C93EFABA2E285974240C"
-        "OwnerKey" = "8:_BEF1041A41D24FF591F281F3D90D09C9"
+        "OwnerKey" = "8:_CF812D926732E98F85DED0A9B5FF1214"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_2EB769AF10A2C93EFABA2E285974240C"
-        "OwnerKey" = "8:_CF812D926732E98F85DED0A9B5FF1214"
+        "OwnerKey" = "8:_BEF1041A41D24FF591F281F3D90D09C9"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -154,13 +160,19 @@
         "Entry"
         {
         "MsmKey" = "8:_2F4B250E0AD29A79C93631253748255D"
-        "OwnerKey" = "8:_BF0B5BE5949D31B5ED11169A7A00B680"
+        "OwnerKey" = "8:_E06AFAAB12E1407AB72053C2884D2988"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_2F4B250E0AD29A79C93631253748255D"
-        "OwnerKey" = "8:_E06AFAAB12E1407AB72053C2884D2988"
+        "OwnerKey" = "8:_1B05A34E4C204582DFFCA82A07DBC120"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2F4B250E0AD29A79C93631253748255D"
+        "OwnerKey" = "8:_BF0B5BE5949D31B5ED11169A7A00B680"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -226,13 +238,25 @@
         "Entry"
         {
         "MsmKey" = "8:_7023DA55205F0EE346C03478BF888D72"
-        "OwnerKey" = "8:_BF0B5BE5949D31B5ED11169A7A00B680"
+        "OwnerKey" = "8:_E06AFAAB12E1407AB72053C2884D2988"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_7023DA55205F0EE346C03478BF888D72"
-        "OwnerKey" = "8:_E06AFAAB12E1407AB72053C2884D2988"
+        "OwnerKey" = "8:_CD2E3B4CDB9FE0E5A66834388C3BA83A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7023DA55205F0EE346C03478BF888D72"
+        "OwnerKey" = "8:_1B05A34E4C204582DFFCA82A07DBC120"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7023DA55205F0EE346C03478BF888D72"
+        "OwnerKey" = "8:_BF0B5BE5949D31B5ED11169A7A00B680"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -345,6 +369,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_BF0B5BE5949D31B5ED11169A7A00B680"
+        "OwnerKey" = "8:_CD2E3B4CDB9FE0E5A66834388C3BA83A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BF0B5BE5949D31B5ED11169A7A00B680"
+        "OwnerKey" = "8:_1B05A34E4C204582DFFCA82A07DBC120"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_C6D62171E98C4FE79EC5BBFBE4263CDE"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -357,6 +393,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_CD2E3B4CDB9FE0E5A66834388C3BA83A"
+        "OwnerKey" = "8:_1B05A34E4C204582DFFCA82A07DBC120"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_CF812D926732E98F85DED0A9B5FF1214"
         "OwnerKey" = "8:_28B9A49E95EC4C06AC33FBF85D776D09"
         "MsmSig" = "8:_UNDEFINED"
@@ -365,6 +407,18 @@
         {
         "MsmKey" = "8:_D0291D0119E66C670F644F52B2D49095"
         "OwnerKey" = "8:_F21CB55258D8417D929FCE80AB137948"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D0291D0119E66C670F644F52B2D49095"
+        "OwnerKey" = "8:_1B05A34E4C204582DFFCA82A07DBC120"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D0291D0119E66C670F644F52B2D49095"
+        "OwnerKey" = "8:_1E277756E6F7CD623B971F39D65AF823"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -394,12 +448,6 @@
         "Entry"
         {
         "MsmKey" = "8:_D5A63D4B34321F7743C7191644DB7546"
-        "OwnerKey" = "8:_CF812D926732E98F85DED0A9B5FF1214"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D5A63D4B34321F7743C7191644DB7546"
         "OwnerKey" = "8:_369A22F67633EAF2A7FC46E4D6814E9F"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -407,6 +455,12 @@
         {
         "MsmKey" = "8:_D5A63D4B34321F7743C7191644DB7546"
         "OwnerKey" = "8:_2EB769AF10A2C93EFABA2E285974240C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D5A63D4B34321F7743C7191644DB7546"
+        "OwnerKey" = "8:_CF812D926732E98F85DED0A9B5FF1214"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -442,6 +496,18 @@
         "Entry"
         {
         "MsmKey" = "8:_E00576EDD3342CEAE7FFBE4FE2651F5F"
+        "OwnerKey" = "8:_CD2E3B4CDB9FE0E5A66834388C3BA83A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E00576EDD3342CEAE7FFBE4FE2651F5F"
+        "OwnerKey" = "8:_1B05A34E4C204582DFFCA82A07DBC120"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E00576EDD3342CEAE7FFBE4FE2651F5F"
         "OwnerKey" = "8:_BF0B5BE5949D31B5ED11169A7A00B680"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -461,6 +527,12 @@
         {
         "MsmKey" = "8:_F21CB55258D8417D929FCE80AB137948"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FD878D9B718422CB4D4D3204242F53DD"
+        "OwnerKey" = "8:_1B05A34E4C204582DFFCA82A07DBC120"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -508,6 +580,12 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_D0291D0119E66C670F644F52B2D49095"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_CCC144E69C494C4496439FB6298F1815"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -550,12 +628,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_D0291D0119E66C670F644F52B2D49095"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_9C9BC478C9D1209008A0ABB957890751"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -586,6 +658,12 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_7023DA55205F0EE346C03478BF888D72"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_6DCF98D064ACD8A9EC49392A1059BCD8"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -604,6 +682,12 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_5BEC122D186A0442F2C1AA4DE151939E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_538CE0CF11F08986727CCA11098E878D"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -611,6 +695,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_45D2F2D3CAD98B2ABA7F4A61063D5C4C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_2F4B250E0AD29A79C93631253748255D"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -640,13 +730,31 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_5BEC122D186A0442F2C1AA4DE151939E"
+        "OwnerKey" = "8:_2430F601C5EE4359808B0981DBEE620E"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_2430F601C5EE4359808B0981DBEE620E"
+        "OwnerKey" = "8:_1B05A34E4C204582DFFCA82A07DBC120"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_FD878D9B718422CB4D4D3204242F53DD"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_CD2E3B4CDB9FE0E5A66834388C3BA83A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_1E277756E6F7CD623B971F39D65AF823"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -677,18 +785,6 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_BF0B5BE5949D31B5ED11169A7A00B680"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7023DA55205F0EE346C03478BF888D72"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_2F4B250E0AD29A79C93631253748255D"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -951,11 +1047,47 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:System.Text.Json, Version=7.0.0.3, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:System.Text.Json, Version=8.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_1B05A34E4C204582DFFCA82A07DBC120"
+                    {
+                    "Name" = "8:System.Text.Json.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:..\\GZKFingerprintScanner\\bin\\Release\\System.Text.Json.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_16C52F90D7464F08B819AF9C7EF28CED"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1E277756E6F7CD623B971F39D65AF823"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_1E277756E6F7CD623B971F39D65AF823"
+                    {
+                    "Name" = "8:Microsoft.Bcl.AsyncInterfaces.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Microsoft.Bcl.AsyncInterfaces.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_16C52F90D7464F08B819AF9C7EF28CED"
@@ -1099,7 +1231,7 @@
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:..\\GZKFingerprintScanner\\bin\\Release\\SocketIO.Serializer.Core.dll"
+            "SourcePath" = "8:SocketIO.Serializer.Core.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_16C52F90D7464F08B819AF9C7EF28CED"
@@ -1130,7 +1262,7 @@
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:..\\GZKFingerprintScanner\\bin\\Release\\System.Numerics.Vectors.dll"
+            "SourcePath" = "8:System.Numerics.Vectors.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_16C52F90D7464F08B819AF9C7EF28CED"
@@ -1181,7 +1313,7 @@
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:..\\GZKFingerprintScanner\\bin\\Release\\SocketIO.Serializer.SystemTextJson.dll"
+            "SourcePath" = "8:SocketIO.Serializer.SystemTextJson.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_16C52F90D7464F08B819AF9C7EF28CED"
@@ -1305,7 +1437,7 @@
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:..\\GZKFingerprintScanner\\bin\\Release\\libzkfpcsharp.dll"
+            "SourcePath" = "8:libzkfpcsharp.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_16C52F90D7464F08B819AF9C7EF28CED"
@@ -1429,7 +1561,7 @@
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:..\\GZKFingerprintScanner\\bin\\Release\\System.Runtime.CompilerServices.Unsafe.dll"
+            "SourcePath" = "8:System.Runtime.CompilerServices.Unsafe.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_16C52F90D7464F08B819AF9C7EF28CED"
@@ -1943,6 +2075,37 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_CD2E3B4CDB9FE0E5A66834388C3BA83A"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:System.Text.Encodings.Web, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_CD2E3B4CDB9FE0E5A66834388C3BA83A"
+                    {
+                    "Name" = "8:System.Text.Encodings.Web.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:System.Text.Encodings.Web.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_16C52F90D7464F08B819AF9C7EF28CED"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_CF812D926732E98F85DED0A9B5FF1214"
             {
             "AssemblyRegister" = "3:1"
@@ -1987,7 +2150,7 @@
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:..\\GZKFingerprintScanner\\bin\\Release\\System.Threading.Tasks.Extensions.dll"
+            "SourcePath" = "8:System.Threading.Tasks.Extensions.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_16C52F90D7464F08B819AF9C7EF28CED"
@@ -2273,6 +2436,37 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_FD878D9B718422CB4D4D3204242F53DD"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_FD878D9B718422CB4D4D3204242F53DD"
+                    {
+                    "Name" = "8:System.ValueTuple.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:System.ValueTuple.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_16C52F90D7464F08B819AF9C7EF28CED"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -2340,15 +2534,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:GZKFingerprintScannerApp"
-        "ProductCode" = "8:{5E37FC1C-B6E9-4903-9DA2-A78CA0F75DEB}"
-        "PackageCode" = "8:{ECA02E04-6642-4190-BC63-72B98602B629}"
+        "ProductCode" = "8:{71D69605-BAE0-4D61-8674-9ED496A0BB79}"
+        "PackageCode" = "8:{8E673EFB-68CB-4E9C-A649-A2D88186990D}"
         "UpgradeCode" = "8:{33C753A7-8396-4189-997A-6C3E811ECD75}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
+        "ProductVersion" = "8:1.0.1"
         "Manufacturer" = "8:Gtel"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

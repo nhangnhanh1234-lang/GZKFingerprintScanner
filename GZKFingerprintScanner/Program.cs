@@ -1,28 +1,71 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Windows.Forms;
+using GZKFingerprintScanner.Helpers;
 
 namespace GZKFingerprintScanner
 {
     internal static class Program
     {
-        /// <summary>Single-instance mutex key.</summary>
-        private const string MutexKey = @"Global\GZKFingerprintScanner_SingleInstance_v1";
-
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
-            // Single-instance lock: tránh chạy 2 lần (double-click icon, autostart trùng...)
-            using (var mutex = new Mutex(true, MutexKey, out bool createdNew))
+            // Lấy deep link từ command line arguments
+            string deepLinkUrl = args != null && args.Length > 0 ? args[0] : null;
+
+            // Kiểm tra xem có phải deep link không
+            bool isDeepLink = !string.IsNullOrEmpty(deepLinkUrl) && deepLinkUrl.StartsWith("gemr://", StringComparison.OrdinalIgnoreCase);
+
+            // Single Instance Manager với Named Pipes
+            using (var singleInstance = new SingleInstanceManager())
             {
-                if (!createdNew)
+                bool isFirstInstance = singleInstance.Initialize();
+                
+                // Debug log
+                System.Diagnostics.Debug.WriteLine($"[INSTANCE] isFirstInstance={isFirstInstance}, deepLink={deepLinkUrl}");
+
+                if (!isFirstInstance)
                 {
-                    MessageBox.Show(
-                        "GZKFingerprintScanner đang chạy ở system tray.",
-                        "GZKFingerprintScanner", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Tiến trình thứ hai: gửi deep link (nếu có) và thoát NGAY
+                    if (isDeepLink)
+                    {
+                        bool sent = SingleInstanceManager.SendToRunningInstance(deepLinkUrl);
+                        System.Diagnostics.Debug.WriteLine($"[INSTANCE] Sent to running instance: {sent}");
+                    }
+                    else
+                    {
+                        MessageBox.Show(
+                            "GZKFingerprintScanner đang chạy ở system tray.",
+                            "GZKFingerprintScanner", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    // EXIT NGAY - không chạy gì thêm
                     return;
+                }
+                
+                System.Diagnostics.Debug.WriteLine("[INSTANCE] This is FIRST instance, starting service...");
+
+                // Tiến trình đầu tiên: đăng ký deep link protocol nếu chưa có
+                // Lưu ý: ClickOnce không hỗ trợ requireAdministrator nên việc đăng ký
+                // có thể thất bại nếu không có quyền Admin. Đăng ký thủ công qua .reg file.
+                try
+                {
+                    if (!DeepLinkRegistry.IsRegistered())
+                    {
+                        DeepLinkRegistry.Register();
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // ClickOnce chạy không có quyền Admin - bỏ qua
+                    // Người dùng cần đăng ký thủ công qua RegisterDeepLink.reg
+                }
+                catch (Exception ex)
+                {
+                    // Ghi log nhưng không crash - app vẫn hoạt động
+                    LogAndNotify(ex, "DeepLink registration");
                 }
 
                 // Bật TLS 1.2/1.3 cho .NET 4.7.2 (mặc định chỉ TLS 1.0/1.1).
@@ -49,8 +92,27 @@ namespace GZKFingerprintScanner
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
+                // DOUBLE CHECK: Đảm bảo chỉ first instance mới tạo TrayApplicationContext
+                // Nếu có cờ hiệu instance khác đang chạy, thoát ngay
+                if (!isFirstInstance)
+                {
+                    System.Diagnostics.Debug.WriteLine("[INSTANCE] GUARD: Secondary instance detected, exiting!");
+                    return;
+                }
+
                 // Use TrayApplicationContext instead of Form1 for tray-only app
-                Application.Run(new TrayApplicationContext());
+                var context = new TrayApplicationContext();
+
+                // Đăng ký event nhận deep link từ tiến trình khác
+                singleInstance.DeepLinkReceived += url => context.ProcessDeepLink(url);
+
+                // Xử lý deep link khởi động (nếu có)
+                if (isDeepLink)
+                {
+                    context.ProcessDeepLink(deepLinkUrl);
+                }
+
+                Application.Run(context);
             }
         }
 

@@ -33,3 +33,4 @@ E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFinge.87B77DC
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintScanner.exe
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\obj\Release\GZKFingerprintScanner.pdb
 E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\Microsoft.Win32.Registry.dll
+E:\gtel\GZKFingerprintScanner\GZKFingerprintScanner\bin\Release\Resources\WebClient\index.html

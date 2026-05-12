@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8" />
+  <title>ZK Teco Fingerprint Console</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --panel2: #273449;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --err: #ef4444;
+      --info: #3b82f6;
+      --border: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 14px 20px;
+      background: linear-gradient(90deg, #1e3a8a, #312e81);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 10px;
+      flex-shrink: 0
+    }
+
+    header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -.01em
+    }
+
+    .sub {
+      font-size: 11px;
+      color: #93c5fd;
+      margin-top: 2px
+    }
+
+    .badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--panel2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      transition: all .2s
+    }
+
+    .badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0
+    }
+
+    .badge.ok {
+      color: var(--ok);
+      border-color: var(--ok)
+    }
+
+    .badge.ok .dot {
+      background: var(--ok);
+      box-shadow: 0 0 7px var(--ok)
+    }
+
+    .badge.err {
+      color: var(--err);
+      border-color: var(--err)
+    }
+
+    .badge.err .dot {
+      background: var(--err);
+      box-shadow: 0 0 7px var(--err)
+    }
+
+    .badge.warn {
+      color: var(--warn);
+      border-color: var(--warn)
+    }
+
+    .badge.warn .dot {
+      background: var(--warn);
+      box-shadow: 0 0 7px var(--warn)
+    }
+
+    .badge.info {
+      color: var(--info);
+      border-color: var(--info)
+    }
+
+    .badge.info .dot {
+      background: var(--info);
+      box-shadow: 0 0 7px var(--info)
+    }
+
+    /* ── Layout ── */
+    main {
+      display: grid;
+      grid-template-columns: 300px 1fr 320px;
+      gap: 14px;
+      padding: 14px;
+      flex: 1;
+      min-height: 0
+    }
+
+    @media(max-width:1100px) {
+      main {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media(max-width:700px) {
+      main {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0
+    }
+
+    .panel-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    /* ── Buttons ── */
+    button {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      background: var(--info);
+      color: #fff;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: filter .15s, transform .05s;
+      white-space: nowrap
+    }
+
+    button:hover:not(:disabled) {
+      filter: brightness(1.12)
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(1px)
+    }
+
+    button:disabled {
+      opacity: .4;
+      cursor: not-allowed
+    }
+
+    .btn-ok {
+      background: var(--ok) !important
+    }
+
+    .btn-warn {
+      background: var(--warn) !important;
+      color: #111 !important
+    }
+
+    .btn-err {
+      background: var(--err) !important
+    }
+
+    .btn-ghost {
+      background: transparent !important;
+      color: var(--text) !important;
+      border: 1px solid var(--border) !important
+    }
+
+    .btn-launch {
+      background: linear-gradient(135deg, var(--info), #2563eb) !important;
+      color: #fff !important;
+      font-weight: 600 !important;
+      padding: 8px 16px !important;
+      border-radius: 8px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      text-decoration: none !important;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-launch:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4) !important;
+      filter: brightness(1.1) !important;
+    }
+
+    .btn-launch:active {
+      transform: translateY(0) !important;
+    }
+
+    .btns {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap
+    }
+
+    .btns.col {
+      flex-direction: column;
+      align-items: stretch
+    }
+
+    .btns.col button {
+      text-align: left
+    }
+
+    /* ── Forms ── */
+    label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      display: block
+    }
+
+    input[type=text],
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 11px;
+      outline: none;
+      transition: border-color .15s
+    }
+
+    input[type=text]:focus,
+    textarea:focus {
+      border-color: var(--info)
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px
+    }
+
+    /* ── Fingerprint image ── */
+    .fp-wrap {
+      background: var(--bg);
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      flex: 1;
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative
+    }
+
+    .fp-wrap img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 4px;
+      image-rendering: pixelated
+    }
+
+    .fp-ph {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      line-height: 1.6
+    }
+
+    .fp-pulse {
+      position: absolute;
+      inset: 0;
+      border-radius: 10px;
+      animation: pulse .8s ease-in-out infinite alternate;
+      pointer-events: none
+    }
+
+    @keyframes pulse {
+      from {
+        box-shadow: inset 0 0 0 2px transparent
+      }
+
+      to {
+        box-shadow: inset 0 0 0 2px var(--ok)
+      }
+    }
+
+    /* ── Verify result ── */
+    .vbox {
+      border-radius: 8px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      display: none;
+      gap: 6px;
+      flex-direction: column
+    }
+
+    .vbox.match {
+      display: flex;
+      background: rgba(34, 197, 94, .1);
+      border-color: var(--ok)
+    }
+
+    .vbox.nomatch {
+      display: flex;
+      background: rgba(239, 68, 68, .08);
+      border-color: var(--err)
+    }
+
+    .vbox-title {
+      font-size: 16px;
+      font-weight: 700
+    }
+
+    .vbox-score {
+      font-family: ui-monospace, monospace;
+      font-size: 11px;
+      color: var(--muted)
+    }
+
+    /* ── Metadata grid ── */
+    .kv {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 5px 10px;
+      font-size: 12px
+    }
+
+    .kv .k {
+      color: var(--muted);
+      align-self: start
+    }
+
+    .kv .v {
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      word-break: break-all;
+      font-size: 11px
+    }
+
+    /* ── Log ── */
+    .log {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      height: 260px;
+      overflow-y: auto;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 11px;
+      scroll-behavior: smooth
+    }
+
+    .ll {
+      display: flex;
+      gap: 6px;
+      padding: 2px 0;
+      border-bottom: 1px dotted #1e2d45;
+      line-height: 1.5
+    }
+
+    .ll:last-child {
+      border-bottom: 0
+    }
+
+    .ll .t {
+      color: var(--muted);
+      flex-shrink: 0;
+      font-size: 10px;
+      padding-top: 1px
+    }
+
+    .ll.info .m {
+      color: var(--info)
+    }
+
+    .ll.ok .m {
+      color: var(--ok)
+    }
+
+    .ll.warn .m {
+      color: var(--warn)
+    }
+
+    .ll.err .m {
+      color: var(--err)
+    }
+
+    /* ── Misc ── */
+    .sep {
+      height: 1px;
+      background: var(--border)
+    }
+
+    .row {
+      display: flex;
+      gap: 6px;
+      align-items: center
+    }
+
+    code {
+      background: #0b1220;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-family: ui-monospace, monospace
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div>
+      <h1>🔑 ZK Teco Fingerprint Console</h1>
+      <div class="sub" id="subInfo">Chưa kết nối · server: http://localhost:8023</div>
+    </div>
+    <div class="badges">
+      <span id="bSocket" class="badge err"><span class="dot"></span><span>Socket: off</span></span>
+      <span id="bDevice" class="badge"><span class="dot"></span><span>Device: –</span></span>
+      <span id="bMode" class="badge"><span class="dot"></span><span>Mode: –</span></span>
+      <span id="bSN" class="badge info" style="display:none"><span class="dot"></span><span>SN: –</span></span>
+    </div>
+    <a href="#" id="btnLaunchApp" class="btn-launch" title="Mở ứng dụng ZK Scanner">🚀 Mở App</a>
+  </header>
+
+  <main>
+    <!-- ── LEFT PANEL ── -->
+    <section class="panel">
+      <div class="panel-title">⚡ Kết nối Socket</div>
+
+      <div>
+        <label>Server URL</label>
+        <input type="text" id="inpUrl" value="http://localhost:8023" />
+        <label>Group</label>
+        <input type="text" id="inpGroup" value="kyvantay" />
+        <label>Client ID</label>
+        <input type="text" id="inpClient" value="web-1" />
+      </div>
+      <div class="btns">
+        <button id="btnConnect" class="btn-ok" style="flex:1">Kết nối</button>
+        <button id="btnDisconnect" class="btn-ghost" disabled>Ngắt</button>
+      </div>
+
+      <div class="sep"></div>
+      <div class="panel-title">🖨 Máy quét</div>
+      <div class="btns col">
+        <button id="btnDevConn" class="btn-ok" disabled>Kết nối máy quét</button>
+        <button id="btnDevDisc" class="btn-err" disabled>Ngắt máy quét</button>
+        <button id="btnScan" class="btn-ghost" disabled>Chế độ Scan (mặc định)</button>
+      </div>
+
+      <div class="sep"></div>
+      <div class="panel-title">🔍 Xác thực 1:1</div>
+      <div>
+        <label>Template mục tiêu (Base64)</label>
+        <textarea id="inpTpl" placeholder="Paste template base64 từ lần quét…"></textarea>
+      </div>
+      <div class="row">
+        <button id="btnUseLast" class="btn-ghost" disabled style="flex:1">Dùng template vừa quét</button>
+        <button id="btnClearTpl" class="btn-ghost">Xoá</button>
+      </div>
+      <div class="btns">
+        <button id="btnVerify" class="btn-warn" disabled style="flex:1">▶ Bật xác thực</button>
+        <button id="btnStopVerify" class="btn-ghost" disabled>■ Tắt</button>
+      </div>
+    </section>
+
+    <!-- ── CENTER PANEL ── -->
+    <section class="panel">
+      <div class="panel-title">👆 Vân tay</div>
+      <div class="fp-wrap" id="fpWrap">
+        <div class="fp-ph">Đặt ngón tay lên máy quét<br />sau khi kết nối thiết bị</div>
+      </div>
+
+      <div id="vbox" class="vbox">
+        <div class="vbox-title" id="vTitle"></div>
+        <div class="vbox-score" id="vScore"></div>
+      </div>
+
+      <div class="sep"></div>
+      <div class="panel-title">📋 Thông tin</div>
+      <div class="kv">
+        <div class="k">Thời gian</div>
+        <div class="v" id="mTime">–</div>
+        <div class="k">Template</div>
+        <div class="v" id="mTpl">–</div>
+        <div class="k">Ảnh</div>
+        <div class="v" id="mImg">–</div>
+        <div class="k">Client</div>
+        <div class="v" id="mCli">–</div>
+      </div>
+
+      <div>
+        <label>Template vừa quét <span style="color:var(--muted);font-weight:400">(copy để Verify)</span></label>
+        <textarea id="outTpl" readonly style="min-height:60px"></textarea>
+      </div>
+      <div class="btns">
+        <button id="btnCopyTpl" class="btn-ghost" disabled>📋 Copy template</button>
+      </div>
+    </section>
+
+    <!-- ── RIGHT PANEL ── -->
+    <section class="panel">
+      <div class="panel-title">📜 Activity Log</div>
+      <div class="log" id="log"></div>
+      <div class="btns">
+        <button id="btnClearLog" class="btn-ghost">Xoá log</button>
+      </div>
+
+      <div class="sep"></div>
+      <div class="panel-title">📖 Schema nhanh</div>
+      <div class="hint">
+        <b>Gửi</b> → <code>LeoReceiveMessage</code><br />
+        <code>{ group, action, clientId, templateData? }</code><br /><br />
+        <b>action:</b> <code>connect</code> <code>disconnect</code> <code>scan</code> <code>verify</code>
+        <code>stop_verify</code><br /><br />
+        <b>Nhận:</b><br />
+        <code>serviceReady</code> · <code>device-status</code><br />
+        <code>fingerprint-data</code><br />
+        <code>fingerprint-verify-result</code>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+      const $ = id => document.getElementById(id);
+
+      /* ── helpers ── */
+      function setBadge(el, label, cls) { el.className = 'badge ' + (cls || ''); el.lastElementChild.textContent = label }
+      function ts() { const d = new Date(); return d.toTimeString().slice(0, 8) + '.' + String(d.getMilliseconds()).padStart(3, '0') }
+      function log(msg, lvl) {
+        const el = document.createElement('div');
+        el.className = 'll ' + (lvl || 'info');
+        el.innerHTML = '<span class="t">' + ts() + '</span><span class="m"></span>';
+        el.lastElementChild.textContent = msg;
+        const box = $('log'); box.appendChild(el); box.scrollTop = box.scrollHeight;
+      }
+      function safe(s) { try { return typeof s === 'string' ? JSON.parse(s) : s } catch { return null } }
+
+      /* ── state ── */
+      let socket = null, devOpen = false, verMode = false, lastTpl = null;
+
+      /* ── badge refs ── */
+      const bSock = $('bSocket'), bDev = $('bDevice'), bMode = $('bMode'), bSN = $('bSN');
+      setBadge(bSock, 'Socket: off', 'err');
+
+      /* ── ui sync ── */
+      function syncUi() {
+        const ok = !!(socket && socket.connected);
+        $('btnDisconnect').disabled = !ok;
+        $('btnConnect').disabled = ok;
+        $('btnDevConn').disabled = !ok || devOpen;
+        $('btnDevDisc').disabled = !ok || !devOpen;
+        $('btnScan').disabled = !ok || !devOpen;
+        $('btnVerify').disabled = !ok || !devOpen || !$('inpTpl').value.trim();
+        $('btnStopVerify').disabled = !ok || !verMode;
+        $('btnUseLast').disabled = !lastTpl;
+        setBadge(bMode,
+          verMode ? 'Mode: VERIFY' : devOpen ? 'Mode: SCAN' : 'Mode: –',
+          verMode ? 'warn' : devOpen ? 'info' : '');
+      }
+      $('inpTpl').addEventListener('input', syncUi);
+
+      /* ── emit command helper ── */
+      function send(action, extra) {
+        if (!socket || !socket.connected) { log('Socket chưa kết nối', 'err'); return; }
+        const p = Object.assign({
+          type: 'command',
+          group: $('inpGroup').value.trim() || 'kyvantay',
+          action,
+          clientId: $('inpClient').value.trim() || 'web-1'
+        }, extra || {});
+        log('>> ' + action + (p.templateData ? ' [+tpl]' : ''), 'info');
+        socket.emit('message', JSON.stringify(p));
+      }
+
+      /* ── xử lý message nhận về ── */
+      function onMessage(raw) {
+        const msg = safe(raw) || raw || {};
+        const t = msg.type || '';
+
+        if (t === 'serviceReady') {
+          log('← serviceReady  service=' + msg.service + ' deviceOpen=' + msg.deviceOpen, 'ok');
+          if (msg.deviceOpen) { devOpen = true; setBadge(bDev, 'Device: on', 'ok'); syncUi(); }
+          return;
+        }
+
+        if (t === 'device_status') {
+          const s = msg.status || '', sn = msg.deviceSn || '', txt = msg.message || '';
+          log('← device-status [' + s + '] ' + (txt || sn), 'info');
+          switch (s) {
+            case 'connected':
+              devOpen = true; setBadge(bDev, 'Device: on', 'ok');
+              if (sn) { bSN.style.display = 'inline-flex'; setBadge(bSN, 'SN: ' + sn, 'info'); }
+              break;
+            case 'disconnected': case 'offline':
+              devOpen = false; verMode = false;
+              setBadge(bDev, 'Device: ' + s, 'warn');
+              bSN.style.display = 'none';
+              $('vbox').className = 'vbox';
+              break;
+            case 'error':
+              setBadge(bDev, 'Device: lỗi', 'err'); break;
+            case 'verify_mode':
+              verMode = true; break;
+            case 'scan_mode':
+              verMode = false; $('vbox').className = 'vbox'; break;
+          }
+          syncUi();
+          return;
+        }
+
+        if (t === 'fingerprint') {
+          const img = msg.imageBase64 || msg.ImageBase64 || '';
+          const tpl = msg.templateBase64 || msg.TemplateBase64 || '';
+          const cid = msg.clientId || msg.ClientId || '';
+          if (img) {
+            $('fpWrap').innerHTML = '<img alt="fp" src="data:image/bmp;base64,' + img + '"/>';
+            $('mImg').textContent = img.length.toLocaleString() + ' chars';
+          }
+          if (tpl) {
+            lastTpl = tpl;
+            $('outTpl').value = tpl;
+            $('mTpl').textContent = tpl.length.toLocaleString() + ' chars';
+            $('btnCopyTpl').disabled = false;
+            syncUi();
+          }
+          $('mTime').textContent = new Date().toLocaleTimeString();
+          $('mCli').textContent = cid || '–';
+          log('← fingerprint  img=' + img.length + '  tpl=' + tpl.length, 'ok');
+          return;
+        }
+
+        if (t === 'verify_result') {
+          const match = msg.isMatch ?? msg.IsMatch ?? false;
+          const score = msg.score ?? msg.Score ?? 0;
+          $('vbox').className = 'vbox ' + (match ? 'match' : 'nomatch');
+          $('vTitle').textContent = match ? '✔ XÁC THỰC THÀNH CÔNG' : '✖ XÁC THỰC THẤT BẠI';
+          $('vScore').textContent = 'score=' + score
+            + (msg.clientId || msg.ClientId ? ' · client=' + (msg.clientId || msg.ClientId) : '')
+            + ' · ' + new Date().toLocaleTimeString();
+          log('← verify-result  match=' + match + '  score=' + score, match ? 'ok' : 'err');
+          return;
+        }
+
+        // message khác (từ hệ thống khác cùng room) — chỉ log nếu không phải command mình tự gửi
+        if (t && t !== 'command') {
+          log('← [' + t + '] ' + JSON.stringify(msg).slice(0, 120), 'warn');
+        }
+      }
+
+      /* ── connect socket ── */
+      $('btnConnect').onclick = () => {
+        const url = $('inpUrl').value.trim();
+        const grp = $('inpGroup').value.trim() || 'kyvantay';
+        if (!url) return;
+        if (socket) { try { socket.disconnect() } catch { } }
+        log('Đang kết nối → ' + url, 'info');
+        $('subInfo').textContent = 'Đang kết nối · ' + url;
+
+        socket = io(url, { transports: ['websocket', 'polling'], reconnection: true, reconnectionDelay: 2000 });
+
+        socket.on('connect', () => {
+          setBadge(bSock, 'Socket: on', 'ok');
+          $('subInfo').textContent = 'Đã kết nối · ' + url + ' · id: ' + socket.id;
+          log('✓ Connected  id=' + socket.id, 'ok');
+          // Join room
+          socket.emit('join', grp);
+          log('>> join room: ' + grp, 'info');
+          syncUi();
+        });
+
+        socket.on('joined', info => {
+          log('← joined  ' + JSON.stringify(info), 'ok');
+        });
+
+        socket.on('disconnect', reason => {
+          setBadge(bSock, 'Socket: off', 'err');
+          setBadge(bDev, 'Device: –', '');
+          bSN.style.display = 'none';
+          devOpen = false; verMode = false;
+          $('subInfo').textContent = 'Mất kết nối · ' + reason;
+          log('✗ Disconnected: ' + reason, 'warn');
+          syncUi();
+        });
+        socket.on('connect_error', e => log('connect_error: ' + e.message, 'err'));
+
+        socket.on('message', onMessage);
+
+        socket.onAny((evt, ...args) => {
+          if (['connect', 'disconnect', 'connect_error', 'message', 'joined', 'peer-joined', 'peer-left'].includes(evt)) return;
+          log('← [' + evt + '] ' + JSON.stringify(args).slice(0, 120), 'warn');
+        });
+      };
+
+      /* ── button handlers ── */
+      $('btnDisconnect').onclick = () => { if (socket) try { socket.disconnect() } catch { } };
+      $('btnDevConn').onclick = () => send('connect');
+      $('btnDevDisc').onclick = () => send('disconnect');
+      $('btnScan').onclick = () => { send('scan'); verMode = false; $('vbox').className = 'vbox'; syncUi(); };
+      $('btnVerify').onclick = () => {
+        const tpl = $('inpTpl').value.trim();
+        if (!tpl) { log('Cần nhập template mục tiêu', 'err'); return; }
+        send('verify', { templateData: tpl });
+      };
+      $('btnStopVerify').onclick = () => { send('stop_verify'); verMode = false; $('vbox').className = 'vbox'; syncUi(); };
+      $('btnUseLast').onclick = () => { if (lastTpl) { $('inpTpl').value = lastTpl; syncUi(); log('Dùng template vừa quét', 'info'); } };
+      $('btnClearTpl').onclick = () => { $('inpTpl').value = ''; syncUi(); };
+      $('btnCopyTpl').onclick = async () => {
+        try { await navigator.clipboard.writeText($('outTpl').value); log('Đã copy template', 'info'); }
+        catch (e) { log('Clipboard lỗi: ' + e, 'err'); }
+      };
+      $('btnClearLog').onclick = () => { $('log').innerHTML = ''; };
+
+      // Launch App button - open deep link
+      $('btnLaunchApp').onclick = (e) => {
+        e.preventDefault();
+        const room = $('inpGroup').value.trim() || 'default';
+        const deepLink = `gemr://open?room=${encodeURIComponent(room)}`;
+        log('Đang mở ứng dụng: ' + deepLink, 'info');
+        window.location.href = deepLink;
+      };
+
+      // Auto-fill từ URL params: ?room=zk_XXX&url=https://...&client=web-1
+      // Dùng href thay vì .search vì file:// có thể không populate .search đúng
+      (function applyUrlParams() {
+        const href = window.location.href;
+        const qIdx = href.indexOf('?');
+        if (qIdx === -1) return;
+        const params = new URLSearchParams(href.substring(qIdx));
+        const room   = params.get('room');
+        const url    = params.get('url');
+        const client = params.get('client');
+        if (room)   { $('inpGroup').value  = room; }
+        if (url)    { $('inpUrl').value    = decodeURIComponent(url); }
+        if (client) { $('inpClient').value = client; }
+        if (room || url) log('✓ Tự động điền từ app: room=' + (room||'–') + ' url=' + (url||'–'), 'ok');
+      })();
+
+      syncUi();
+      log('Mở file thành công. Nhấn "Kết nối" để bắt đầu.', 'info');
+    })();
+  </script>
+</body>
+
+</html>

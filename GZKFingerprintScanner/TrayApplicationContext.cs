@@ -2,9 +2,12 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GZKFingerprintScanner.Helpers;
 using GZKFingerprintScanner.Logging;
 using GZKFingerprintScanner.Models;
 using GZKFingerprintScanner.Services;
@@ -25,8 +28,10 @@ namespace GZKFingerprintScanner
         private readonly ToolStripMenuItem _miConn;
         private readonly ToolStripMenuItem _miUptime;
         private readonly ToolStripMenuItem _miDevice;
+        private readonly ToolStripMenuItem _miRoom;
         private readonly ToolStripMenuItem _miAutostart;
 
+        private SocketClientService _socket;
         private FingerprintService _service;
         private readonly DateTime _startedAt = DateTime.Now;
         private readonly string _logDir;
@@ -38,6 +43,9 @@ namespace GZKFingerprintScanner
 
         private SocketOptions _socketOpts;
         private DeviceOptions _deviceOpts;
+        private string _currentRoom;
+        private string _deviceId; // MAC Address used as device ID
+        private string _pendingRoomFromDeepLink; // Room từ deep link khi khởi động, ưu tiên hơn MAC
 
         public TrayApplicationContext()
         {
@@ -76,12 +84,15 @@ namespace GZKFingerprintScanner
             _miStatus = AddInfoItem("●  Đang khởi động…");
             _miConn = AddInfoItem("Socket: —");
             _miDevice = AddInfoItem("Device: —");
+            _miRoom = AddInfoItem("Room: —");
+            _miRoom.Click += (s, e) => CopyRoomToClipboard();
             _miUptime = AddInfoItem("Uptime: 00:00:00");
             _menu.Items.Add(BuildSeparator());
 
             // Actions section
             _menu.Items.Add(BuildSectionHeader("ACTIONS"));
             _menu.Items.Add(BuildActionItem("\uD83C\uDF10  Mở Web Console", (s, e) => OpenWebConsole()));
+            _menu.Items.Add(BuildActionItem("\uD83D\uDCCB  Copy Room", (s, e) => CopyRoomToClipboard()));
             _menu.Items.Add(BuildActionItem("\u21BB  Khởi động lại dịch vụ", (s, e) => Task.Run(RestartService)));
             _menu.Items.Add(BuildSeparator());
 
@@ -130,7 +141,185 @@ namespace GZKFingerprintScanner
 
             // Load config and start service
             LoadConfig();
+            GenerateDeviceId();
             Task.Run(StartService);
+        }
+
+        /// <summary>
+        /// Sinh deviceId từ MAC Address của máy.
+        /// Thêm prefix "zk_" để web phân biệt room máy quét vân tay.
+        /// </summary>
+        private void GenerateDeviceId()
+        {
+            string mac = MacAddressHelper.GetMacAddress();
+            if (string.IsNullOrEmpty(mac))
+            {
+                // Fallback: dùng tên máy + timestamp nếu không lấy được MAC
+                mac = string.Format("{0}_{1:yyyyMMddHHmmss}", Environment.MachineName, DateTime.Now);
+            }
+            // Thêm prefix để web phân biệt
+            _deviceId = "zk_" + mac;
+            _logger.LogInformation(string.Format("Device ID (MAC): {0}", _deviceId));
+        }
+
+        /// <summary>
+        /// Xử lý deep link URL và chuyển room nếu cần.
+        /// Format: gemr://open?room=TEN_PHONG
+        /// </summary>
+        public void ProcessDeepLink(string deepLinkUrl)
+        {
+            if (string.IsNullOrWhiteSpace(deepLinkUrl)) return;
+
+            _logger.LogInformation(string.Format("[DEEPLINK] Received: {0}", deepLinkUrl));
+
+            try
+            {
+                // Parse URL để lấy tham số room
+                string roomName = ParseRoomFromDeepLink(deepLinkUrl);
+
+                if (string.IsNullOrWhiteSpace(roomName))
+                {
+                    _logger.LogWarning("[DEEPLINK] No room parameter found");
+                    return;
+                }
+
+                // Nếu service chưa start (khởi động từ deep link), lưu lại để ưu tiên
+                if (_service == null)
+                {
+                    _logger.LogInformation(string.Format("[DEEPLINK] Service not started yet, queuing room: {0}", roomName));
+                    _pendingRoomFromDeepLink = roomName.StartsWith("zk_", StringComparison.OrdinalIgnoreCase) 
+                        ? roomName 
+                        : "zk_" + roomName;
+                    return;
+                }
+
+                // Chuyển room - TrayApplicationContext chạy trên UI thread nên gọi trực tiếp
+                // hoặc dùng InvokeRequired nếu cần
+                if (SynchronizationContext.Current != null)
+                {
+                    SynchronizationContext.Current.Post(_ => SwitchRoom(roomName), null);
+                }
+                else
+                {
+                    SwitchRoom(roomName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[DEEPLINK] Error processing deep link");
+            }
+        }
+
+        /// <summary>
+        /// Parse tham số room từ deep link URL.
+        /// </summary>
+        private string ParseRoomFromDeepLink(string url)
+        {
+            try
+            {
+                // Remove protocol prefix
+                if (url.StartsWith("gemr://", StringComparison.OrdinalIgnoreCase))
+                {
+                    url = url.Substring("gemr://".Length);
+                }
+
+                // Parse query string
+                var queryIndex = url.IndexOf('?');
+                if (queryIndex < 0) return null;
+
+                var query = url.Substring(queryIndex + 1);
+                var pairs = query.Split('&');
+
+                foreach (var pair in pairs)
+                {
+                    var eqIndex = pair.IndexOf('=');
+                    if (eqIndex > 0)
+                    {
+                        var key = pair.Substring(0, eqIndex).Trim().ToLowerInvariant();
+                        var value = pair.Substring(eqIndex + 1).Trim();
+
+                        if (key == "room")
+                        {
+                            return Uri.UnescapeDataString(value);
+                        }
+                    }
+                }
+            }
+            catch { }
+            return null;
+        }
+
+        /// <summary>
+        /// Chuyển sang room mới: leave room hiện tại, join room mới, hiển thị thông báo.
+        /// </summary>
+        private async void SwitchRoom(string newRoom)
+        {
+            if (string.IsNullOrWhiteSpace(newRoom)) return;
+            if (newRoom == _currentRoom)
+            {
+                _logger.LogInformation(string.Format("[ROOM] Already in room '{0}'", newRoom));
+                return;
+            }
+
+            _logger.LogInformation(string.Format("[ROOM] Switching from '{0}' to '{1}'", _currentRoom ?? "(none)", newRoom));
+
+            if (_service == null)
+            {
+                _logger.LogWarning("[ROOM] Service not started, cannot switch room");
+                return;
+            }
+
+            // Đợi socket connected trước khi chuyển room
+            int waitCount = 0;
+            while (!_socket.IsConnected && waitCount < 50) // Tối đa 5 giây
+            {
+                await Task.Delay(100);
+                waitCount++;
+            }
+
+            if (!_socket.IsConnected)
+            {
+                _logger.LogError("[ROOM] Socket not connected after waiting, cannot switch room");
+                ShowBalloon("Lỗi", "Không thể kết nối đến server.", ToolTipIcon.Error);
+                return;
+            }
+
+            try
+            {
+                // 1. Gọi leave_room cho phòng hiện tại
+                if (!string.IsNullOrEmpty(_currentRoom))
+                {
+                    await _socket.LeaveRoomAsync();
+                }
+
+                // 2. Gọi join_room cho phòng mới
+                // Nếu room từ deep link không có prefix zk_, thêm vào để web nhận diện
+                string targetRoom = newRoom.StartsWith("zk_", StringComparison.OrdinalIgnoreCase) 
+                    ? newRoom 
+                    : "zk_" + newRoom;
+                bool success = await _socket.JoinRoomAsync(targetRoom);
+
+                if (success)
+                {
+                    _currentRoom = targetRoom; // Lưu room có prefix zk_
+
+                    // 3. Hiển thị BalloonTip thông báo (hiển thị không prefix cho gọn)
+                    string displayRoom = newRoom.StartsWith("zk_", StringComparison.OrdinalIgnoreCase) 
+                        ? newRoom.Substring(3) 
+                        : newRoom;
+                    ShowBalloon("Phòng mới", string.Format("Đã chuyển sang phòng: {0}", displayRoom), ToolTipIcon.Info);
+                    _logger.LogInformation(string.Format("[ROOM] Successfully switched to room '{0}'", newRoom));
+                }
+                else
+                {
+                    ShowBalloon("Lỗi chuyển phòng", "Không thể kết nối đến phòng mới.", ToolTipIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[ROOM] Error switching room");
+                ShowBalloon("Lỗi", "Có lỗi khi chuyển phòng: " + ex.Message, ToolTipIcon.Error);
+            }
         }
 
         private void LoadConfig()
@@ -246,10 +435,41 @@ namespace GZKFingerprintScanner
             {
                 LogStartupDiagnostics();
                 var zk = new ZkTecoService(_zkLogger, _deviceOpts);
-                var socket = new SocketClientService(_socketLogger, _socketOpts, zk);
-                _service = new FingerprintService(_logger, socket, zk, _deviceOpts);
+                _socket = new SocketClientService(_socketLogger, _socketOpts, zk);
+                _service = new FingerprintService(_logger, _socket, zk, _deviceOpts);
                 _service.Start();
                 _logger.LogInformation("Service started successfully");
+
+                // Join room mặc định là deviceId (MAC Address) khi khởi động
+                Task.Run(async () =>
+                {
+                    // Đợi socket kết nối
+                    int retries = 0;
+                    while (!_socket.IsConnected && retries < 50) // Tối đa 50 giây
+                    {
+                        await Task.Delay(1000);
+                        retries++;
+                    }
+
+                    if (_socket.IsConnected && !string.IsNullOrEmpty(_deviceId))
+                    {
+                        // Ưu tiên room từ deep link nếu có, nếu không thì dùng MAC
+                        string targetRoom = _pendingRoomFromDeepLink ?? _deviceId;
+                        
+                        await _socket.JoinRoomAsync(targetRoom);
+                        _currentRoom = targetRoom;
+                        
+                        if (_pendingRoomFromDeepLink != null)
+                        {
+                            _logger.LogInformation(string.Format("[ROOM] Auto-joined room from deep link: {0}", targetRoom));
+                            _pendingRoomFromDeepLink = null; // Clear pending
+                        }
+                        else
+                        {
+                            _logger.LogInformation(string.Format("[ROOM] Auto-joined room (deviceId): {0}", targetRoom));
+                        }
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -270,6 +490,9 @@ namespace GZKFingerprintScanner
                     _service.Dispose();
                     _service = null;
                 }
+                _socket = null;
+                _currentRoom = null;
+                _pendingRoomFromDeepLink = null; // Clear pending room khi restart
 
                 LoadConfig();
                 StartService();
@@ -280,6 +503,32 @@ namespace GZKFingerprintScanner
             {
                 LogCrash(ex);
                 ShowError("Restart thất bại: " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Copy room name hiện tại vào clipboard.
+        /// </summary>
+        private void CopyRoomToClipboard()
+        {
+            try
+            {
+                string roomName = _currentRoom ?? (_socket?.CurrentRoom);
+                if (!string.IsNullOrEmpty(roomName))
+                {
+                    Clipboard.SetText(roomName);
+                    ShowBalloon("Đã copy", string.Format("Room '{0}' đã được copy vào clipboard.", roomName), ToolTipIcon.Info);
+                    _logger.LogInformation(string.Format("[ROOM] Copied to clipboard: {0}", roomName));
+                }
+                else
+                {
+                    ShowBalloon("Thông báo", "Chưa có room nào để copy.", ToolTipIcon.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[ROOM] Failed to copy room to clipboard");
+                ShowBalloon("Lỗi", "Không thể copy room: " + ex.Message, ToolTipIcon.Error);
             }
         }
 
@@ -356,6 +605,23 @@ namespace GZKFingerprintScanner
                 _miUptime.ForeColor = colorMuted;
                 _miUptime.Text = string.Format("Uptime: {0:hh\\:mm\\:ss}", DateTime.Now - _startedAt);
 
+                // Cập nhật Room status - cho phép click để copy
+                string roomName = _currentRoom ?? (_socket?.CurrentRoom);
+                if (!string.IsNullOrEmpty(roomName))
+                {
+                    _miRoom.Text = string.Format("✓  Room  ·  {0}", roomName);
+                    _miRoom.ForeColor = colorMuted;
+                    _miRoom.Enabled = true;
+                    _miRoom.ToolTipText = "Click để copy room name";
+                }
+                else
+                {
+                    _miRoom.Text = "○  Room  ·  —";
+                    _miRoom.ForeColor = colorMuted;
+                    _miRoom.Enabled = false;
+                    _miRoom.ToolTipText = null;
+                }
+
                 string trayText = _miStatus.Text;
                 if (trayText.Length > 63)
                     trayText = trayText.Substring(0, 63);
@@ -416,10 +682,30 @@ namespace GZKFingerprintScanner
 
         private void OpenWebConsole()
         {
-            string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "WebClient", "index.html");
-            file = Path.GetFullPath(file);
-            if (File.Exists(file)) SafeOpen(file);
-            else ShowBalloon("WebClient", "Không tìm thấy WebClient/index.html", ToolTipIcon.Warning);
+            string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "WebClient", "index.html");
+            if (!File.Exists(file))
+            {
+                ShowBalloon("WebClient", "Không tìm thấy Resources\\WebClient\\index.html", ToolTipIcon.Warning);
+                return;
+            }
+
+            // Truyền room và server URL qua query params để web tự điền
+            string room = _currentRoom ?? _deviceId ?? string.Empty;
+            string serverUrl = _socketOpts?.Url ?? string.Empty;
+
+            _logger.LogInformation(string.Format("[WEBCONSOLE] room={0} url={1}", room, serverUrl));
+
+            var sb = new System.Text.StringBuilder("file:///");
+            sb.Append(file.Replace('\\', '/'));
+            sb.Append("?");
+            if (!string.IsNullOrEmpty(room))
+                sb.Append("room=").Append(Uri.EscapeDataString(room)).Append("&");
+            if (!string.IsNullOrEmpty(serverUrl))
+                sb.Append("url=").Append(Uri.EscapeDataString(serverUrl));
+
+            string finalUrl = sb.ToString().TrimEnd('&', '?');
+            _logger.LogInformation(string.Format("[WEBCONSOLE] Opening: {0}", finalUrl));
+            SafeOpen(finalUrl);
         }
 
         private void SafeOpen(string path)
